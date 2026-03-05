@@ -26,12 +26,24 @@ const IMOS_INBOX = process.env.IMOS_INBOX || "C:\\imos_inbox";
 const ALLOWED_IPS = process.env.ALLOWED_IPS
     ? process.env.ALLOWED_IPS.split(",").map((s) => s.trim())
     : null; // null = allow all
-    
+
 // ── Ensure inbox exists ──────────────────────────────────────────────────────
 if (!fs.existsSync(IMOS_INBOX)) {
     fs.mkdirSync(IMOS_INBOX, { recursive: true });
     console.log(`[IMOS Receiver] Created inbox folder: ${IMOS_INBOX}`);
 }
+
+// ── Crash recovery — keep the process alive ──────────────────────────────────
+process.on("uncaughtException", (err) => {
+    console.error(`[IMOS Receiver] UNCAUGHT EXCEPTION: ${err.message}`);
+    console.error(err.stack);
+    // Do NOT exit — keep the server running
+});
+
+process.on("unhandledRejection", (reason) => {
+    console.error(`[IMOS Receiver] UNHANDLED REJECTION: ${reason}`);
+    // Do NOT exit — keep the server running
+});
 
 // ── Express app ──────────────────────────────────────────────────────────────
 const app = express();

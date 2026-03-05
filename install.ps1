@@ -207,19 +207,20 @@ if ($existingTask) {
     Write-Warn "Removed old scheduled task: $taskName"
 }
 
-$nodePath = (Get-Command node).Source
-
-# Write a batch launcher with env vars baked in
+# Write a batch launcher with env vars and logging baked in
+$logFile = Join-Path $InstallDir "server.log"
 $batchLines = @(
     "@echo off",
+    "echo [%date% %time%] Starting IMOS Receiver... >> `"$logFile`"",
     "set PORT=$Port",
     "set IMOS_INBOX=$InboxPath",
     "cd /d `"$InstallDir`"",
-    "`"$nodePath`" server.js"
+    "node server.js >> `"$logFile`" 2>&1"
 )
 $batchFile = Join-Path $InstallDir "start.bat"
 $batchLines | Out-File -FilePath $batchFile -Encoding ASCII
 Write-Ok "Launcher batch created: $batchFile"
+Write-Ok "Server logs will be written to: $logFile"
 
 $action = New-ScheduledTaskAction -Execute $batchFile -WorkingDirectory $InstallDir
 
@@ -229,8 +230,8 @@ $settings = New-ScheduledTaskSettingsSet `
     -AllowStartIfOnBatteries `
     -DontStopIfGoingOnBatteries `
     -StartWhenAvailable `
-    -RestartCount 3 `
-    -RestartInterval (New-TimeSpan -Minutes 1)
+    -RestartCount 999 `
+    -RestartInterval (New-TimeSpan -Seconds 30)
 
 $principal = New-ScheduledTaskPrincipal -UserId "SYSTEM" -LogonType ServiceAccount -RunLevel Highest
 
