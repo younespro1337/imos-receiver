@@ -16,10 +16,14 @@ param(
 
 $xmlFile = Join-Path $PSScriptRoot "test.xml"
 
+
+
+
 if (-not (Test-Path $xmlFile)) {
     Write-Host "[FAIL] test.xml not found at: $xmlFile" -ForegroundColor Red
     exit 1
 }
+
 
 Write-Host ""
 Write-Host "============================================================" -ForegroundColor Cyan

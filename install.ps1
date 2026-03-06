@@ -17,7 +17,7 @@
 
 param(
     [int]$Port = 3500,
-    [string]$InboxPath = "C:\imos_inbox",
+    [string]$InboxPath = "D:\ProgramData\imos AG\Factory\SIM\INBOX",
     [string]$InstallDir = "C:\imos-receiver"
 )
 
