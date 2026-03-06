@@ -232,7 +232,7 @@ $settings = New-ScheduledTaskSettingsSet `
     -DontStopIfGoingOnBatteries `
     -StartWhenAvailable `
     -RestartCount 999 `
-    -RestartInterval (New-TimeSpan -Seconds 30)
+    -RestartInterval (New-TimeSpan -Minutes 1)
 
 $principal = New-ScheduledTaskPrincipal -UserId "SYSTEM" -LogonType ServiceAccount -RunLevel Highest
 
