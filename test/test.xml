@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XML Type="ListBuilder">
+  
+  <Order No="2025001665" DispDate="25.04.2025" Basket="4925">
+    <Head>
+      <COMM>O_TL_25_0165</COMM>
+      <ARTICLENO>2025001665</ARTICLENO>
+      <CUSTOMER></CUSTOMER> <!-- end customer name-->
+      <RETAILER></RETAILER> <!-- fecruser company -->
+      <CLIENT>m.perin@tecnibo.com</CLIENT> <!-- cruser name -->
+      <PROGRAM></PROGRAM>
+      <EMPLOYEE>Marie Laure PERIN</EMPLOYEE> <!-- editor name -->
+      <TEXT_LONG></TEXT_LONG> <!-- description -->
+      <TEXT_SHORT>O_TL_25_0165</TEXT_SHORT> <!-- title -->
+      <CRDATE>22.04.2025</CRDATE> <!-- create date -->
+      <DELIVERY_DATE></DELIVERY_DATE> <!-- delivery date opt. -->
+      <SHIPPING_DATE></SHIPPING_DATE> <!-- opt. -->
+
+      <!-- info1-5 in imos-->
+      <COLOUR1></COLOUR1>
+      <COLOUR2></COLOUR2>
+      <COLOUR3></COLOUR3>
+      <COLOUR4></COLOUR4>
+      <COLOUR5></COLOUR5>
+
+      <!-- basket creator  info6-15 in imos -->
+      <INFO1>Marie Laure PERIN</INFO1> <!-- name -->
+      <INFO2></INFO2> <!-- company -->
+      <INFO3></INFO3> <!-- address -->
+      <INFO4></INFO4> <!-- zip -->
+      <INFO5></INFO5> <!-- city -->
+      <INFO6></INFO6> <!-- customer number-->
+      <INFO7></INFO7> <!-- country -->
+      <INFO8>m.perin@tecnibo.com</INFO8> <!-- username -->
+      <INFO9></INFO9> <!-- mail -->
+      <INFO10></INFO10> <!-- telephone -->
+      <INFO11></INFO11> <!-- www -->
+      <INFO12></INFO12>
+
+      <!-- editor -->
+      <EDITOR1>Marie Laure PERIN</EDITOR1>
+      <EDITOR2></EDITOR2>
+      <EDITOR3></EDITOR3>
+      <EDITOR4></EDITOR4>
+      <EDITOR5></EDITOR5>
+      <EDITOR6></EDITOR6>
+      <EDITOR7></EDITOR7>
+      <EDITOR8>m.perin@tecnibo.com</EDITOR8>
+
+      <!-- myOffer -->
+      <ADDRESS1></ADDRESS1>
+      <ADDRESS2></ADDRESS2>
+      <ADDRESS3></ADDRESS3>
+      <ADDRESS4></ADDRESS4>
+      <ADDRESS5></ADDRESS5>
+
+      <!-- invoice -->
+      <BILLING_ADDRESS1></BILLING_ADDRESS1>
+      <BILLING_ADDRESS2></BILLING_ADDRESS2>
+      <BILLING_ADDRESS3></BILLING_ADDRESS3>
+      <BILLING_ADDRESS4></BILLING_ADDRESS4>
+      <BILLING_ADDRESS5></BILLING_ADDRESS5>
+      <BILLING_ADDRESS6></BILLING_ADDRESS6>
+
+      <!-- shipping -->
+      <SHIPPING_ADDRESS1></SHIPPING_ADDRESS1>
+      <SHIPPING_ADDRESS2></SHIPPING_ADDRESS2>
+      <SHIPPING_ADDRESS3></SHIPPING_ADDRESS3>
+      <SHIPPING_ADDRESS4></SHIPPING_ADDRESS4>
+      <SHIPPING_ADDRESS5></SHIPPING_ADDRESS5>
+      <SHIPPING_ADDRESS6></SHIPPING_ADDRESS6>
+
+      <!-- contact -->
+      <CONTACT_ADDRESS1></CONTACT_ADDRESS1>
+      <CONTACT_ADDRESS2></CONTACT_ADDRESS2>
+      <CONTACT_ADDRESS3></CONTACT_ADDRESS3>
+      <CONTACT_ADDRESS4></CONTACT_ADDRESS4>
+      <CONTACT_ADDRESS5></CONTACT_ADDRESS5>
+
+      <ORDER_PRICE_INFO1>1002.16</ORDER_PRICE_INFO1> <!-- articlesCost -->
+      <ORDER_PRICE_INFO2>0</ORDER_PRICE_INFO2> <!-- shippingCost -->
+      <ORDER_PRICE_INFO3>1002.16</ORDER_PRICE_INFO3> <!-- totalCost -->
+      <ORDER_PRICE_INFO4>190.41</ORDER_PRICE_INFO4> <!-- totalCostVatAmount -->
+      <ORDER_PRICE_INFO5>1192.57</ORDER_PRICE_INFO5> <!-- totalCostGross -->
+
+      <CUSTOM_INFO1>10</CUSTOM_INFO1> <!-- articleCount -->
+      <CUSTOM_INFO2>2</CUSTOM_INFO2> <!-- positionCount -->
+      <CUSTOM_INFO3></CUSTOM_INFO3>
+      <CUSTOM_INFO4></CUSTOM_INFO4>
+      <CUSTOM_INFO5></CUSTOM_INFO5>
+      <CUSTOM_INFO6></CUSTOM_INFO6>
+      <CUSTOM_INFO7></CUSTOM_INFO7>
+      <CUSTOM_INFO8></CUSTOM_INFO8>
+      <CUSTOM_INFO9></CUSTOM_INFO9>
+      <CUSTOM_INFO10></CUSTOM_INFO10>
+      <GLOBAL_SETTINGS>
+        
+      </GLOBAL_SETTINGS>
+
+      <FileList>
+        
+      </FileList>
+    </Head>
+    <CONTACT_INFO>
+      <FIELD_ANREDE></FIELD_ANREDE>
+      <FIELD_VORNAME1></FIELD_VORNAME1>
+      <FIELD_VORNAME2></FIELD_VORNAME2>
+      <FIELD_NACHNAME></FIELD_NACHNAME>
+      <FIELD_FIRMA></FIELD_FIRMA>
+      <FIELD_PHONE1></FIELD_PHONE1>
+      <FIELD_PHONE2></FIELD_PHONE2>
+      <FIELD_FAX></FIELD_FAX>
+      <FIELD_MOBILE></FIELD_MOBILE>
+      <FIELD_EMAIL1></FIELD_EMAIL1>
+      <FIELD_EMAIL2></FIELD_EMAIL2>
+      <FIELD_KATEGORIE></FIELD_KATEGORIE>
+      <FIELD_STR></FIELD_STR>
+      <FIELD_PLZ></FIELD_PLZ>
+      <FIELD_ORT></FIELD_ORT>
+      <FIELD_LAND></FIELD_LAND>
+      <FIELD_REGION></FIELD_REGION>
+      <FIELD_WEBSITE></FIELD_WEBSITE>
+      <FIELD_KDNR></FIELD_KDNR>
+      <FIELD_MWST></FIELD_MWST>
+    </CONTACT_INFO>
+    <BuilderList>
+      
+        
+        
+		
+			<Set LineNo="1">
+			  <hierarchicalPos>1</hierarchicalPos> <!-- pos. number in basket -->
+			  
+				  <Pname>NP_T100_PANEL_ONLY_1111_S1</Pname>
+				
+			  <Count>8</Count>
+			  <UID>35825</UID>
+			  <Program>2124_3</Program>
+			  <PVarString>ART_NAME:=NP_T100_PANEL_ONLY_1111_S1|USE_CASE_UI:=estimate|CUSTOMER_REQUEST:=CR/01|CUSTOMER_NAME:=|CUSTOMER_REFERENCE:=|ART_SIZEX:=1200|ART_SIZEY:=102|ART_SIZEZ:=2821|top_gap:=30|bot_gap:=30|mat_1_T100_category_combox:=Decor Panel|mat_1_T100_thk_combox:=18|mat_1_T100_core_combox:=UN_EV_551_CST_18mm|srf_1_T100_category_combox:=|srf_1_T100_combox:=NO_SURF|srf_1_T100_text:=|prf_1_T100_category_combox:=Plastic|prf_1_T100_combox:=UNI_551_CST_03|prf_1_T100_PE_combox:=UNI_025_CST_03_PE|___MODEL_NAME:=NP_T100_PANEL_ONLY_1111_S1|___REFID:=35825|</PVarString>
+			  <REF_ID>35825</REF_ID><!-- Article UID -->
+			  <ARTICLE_TEXT_INFO1>NP_T100_PANEL_ONLY_1111_S1</ARTICLE_TEXT_INFO1> <!-- Article name-->
+			  <ARTICLE_TEXT_INFO2>CR/01
+, Width: 1200 mm
+, Depth: 102 mm
+, Height: 2821 mm</ARTICLE_TEXT_INFO2> <!-- descrption -->
+
+
+			  <ARTICLE_TEXT_INFO3></ARTICLE_TEXT_INFO3> <!-- notes -->
+			  <ARTICLE_PRICE_INFO1>107.04</ARTICLE_PRICE_INFO1> <!-- unit Cost, price org.-->
+			  <ARTICLE_PRICE_INFO2>107.04</ARTICLE_PRICE_INFO2> <!-- unit price org -->
+			  <ARTICLE_PRICE_INFO3>107.04</ARTICLE_PRICE_INFO3> <!-- unit price after sales discount-->
+			  <ARTICLE_PRICE_INFO4>19</ARTICLE_PRICE_INFO4> <!-- vat % -->
+			  <ARTICLE_PRICE_INFO5>20.34</ARTICLE_PRICE_INFO5> <!-- price vat -->
+			  <ARTICLE_PRICE_INFO5>127.38</ARTICLE_PRICE_INFO5> <!-- gross price -->
+			  <PInsertion></PInsertion>
+			  <POrntation>0</POrntation>
+			  <ARTICLE_IMAGE></ARTICLE_IMAGE>
+			</Set>
+		
+      
+        
+        
+		
+			<Set LineNo="2">
+			  <hierarchicalPos>2</hierarchicalPos> <!-- pos. number in basket -->
+			  
+				  <Pname>NP_SPP_ALU_VAR</Pname>
+				
+			  <Count>2</Count>
+			  <UID>35828</UID>
+			  <Program>2124_3</Program>
+			  <PVarString>ART_NAME:=NP_SPP_ALU_VAR|ARTICLE_CNT:=1|USE_CASE_UI:=estimate|CUSTOMER_REQUEST:=CR/01|CUSTOMER_NAME:=|CUSTOMER_REFERENCE:=|ART_SIZEX:=5800|ART_SPP_ALU_VAR:=Lisse LB 50 mm Ral 1013 Structure|spp_category_filter:=Metal|spp_section_filter:=|spp_color_filter:=RAL_1013_CX|spp_1_combox:=PSPP_STE_LB_50_LP_1013_CX|___MODEL_NAME:=NP_SPP_ALU_VAR|___REFID:=35828|</PVarString>
+			  <REF_ID>35828</REF_ID><!-- Article UID -->
+			  <ARTICLE_TEXT_INFO1>Profilé</ARTICLE_TEXT_INFO1> <!-- Article name-->
+			  <ARTICLE_TEXT_INFO2>CR/01
+, Width: 5800 mm
+, Lisse LB 50 mm Ral 1013 Structure</ARTICLE_TEXT_INFO2> <!-- descrption -->
+			  <ARTICLE_TEXT_INFO3></ARTICLE_TEXT_INFO3> <!-- notes -->
+			  <ARTICLE_PRICE_INFO1>72.92</ARTICLE_PRICE_INFO1> <!-- unit Cost, price org.-->
+			  <ARTICLE_PRICE_INFO2>72.92</ARTICLE_PRICE_INFO2> <!-- unit price org -->
+			  <ARTICLE_PRICE_INFO3>72.92</ARTICLE_PRICE_INFO3> <!-- unit price after sales discount-->
+			  <ARTICLE_PRICE_INFO4>19</ARTICLE_PRICE_INFO4> <!-- vat % -->
+			  <ARTICLE_PRICE_INFO5>13.85</ARTICLE_PRICE_INFO5> <!-- price vat -->
+			  <ARTICLE_PRICE_INFO5>86.77</ARTICLE_PRICE_INFO5> <!-- gross price -->
+			  <PInsertion></PInsertion>
+			  <POrntation>0</POrntation>
+			  <ARTICLE_IMAGE></ARTICLE_IMAGE>
+			</Set>
+		
+      
+    </BuilderList>
+  </Order>
+</XML>

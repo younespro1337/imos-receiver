@@ -209,13 +209,14 @@ if ($existingTask) {
 
 # Write a batch launcher with env vars and logging baked in
 $logFile = Join-Path $InstallDir "server.log"
+$nodePath = (Get-Command node).Source
 $batchLines = @(
     "@echo off",
     "echo [%date% %time%] Starting IMOS Receiver... >> `"$logFile`"",
     "set PORT=$Port",
     "set IMOS_INBOX=$InboxPath",
     "cd /d `"$InstallDir`"",
-    "node server.js >> `"$logFile`" 2>&1"
+    "`"$nodePath`" server.js >> `"$logFile`" 2>&1"
 )
 $batchFile = Join-Path $InstallDir "start.bat"
 $batchLines | Out-File -FilePath $batchFile -Encoding ASCII

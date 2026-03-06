@@ -20,6 +20,28 @@ const fs = require("fs");
 const path = require("path");
 const os = require("os");
 
+// ── File Logger ──────────────────────────────────────────────────────────────
+// Writes all output to server.log alongside stdout/stderr
+const LOG_FILE = path.join(__dirname, "server.log");
+const logStream = fs.createWriteStream(LOG_FILE, { flags: "a" });
+
+const _origLog = console.log.bind(console);
+const _origErr = console.error.bind(console);
+
+console.log = (...args) => {
+    const msg = args.map(a => (typeof a === "string" ? a : JSON.stringify(a))).join(" ");
+    const line = `[${new Date().toISOString()}] ${msg}`;
+    _origLog(...args);
+    logStream.write(line + "\n");
+};
+
+console.error = (...args) => {
+    const msg = args.map(a => (typeof a === "string" ? a : JSON.stringify(a))).join(" ");
+    const line = `[${new Date().toISOString()}] ERROR: ${msg}`;
+    _origErr(...args);
+    logStream.write(line + "\n");
+};
+
 // ── Config ───────────────────────────────────────────────────────────────────
 const PORT = parseInt(process.env.PORT, 10) || 3500;
 const IMOS_INBOX = process.env.IMOS_INBOX || "C:\\imos_inbox";
