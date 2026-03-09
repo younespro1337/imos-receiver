@@ -1,0 +1,1 @@
+powershell -ExecutionPolicy Bypass -Command "Start-Process powershell -ArgumentList '-ExecutionPolicy Bypass -File C:\imos-receiver\install.ps1' -Verb RunAs -Wait" 2>&1

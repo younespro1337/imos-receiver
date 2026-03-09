@@ -48,6 +48,7 @@ const IMOS_INBOX = process.env.IMOS_INBOX || "C:\\imos_inbox";
 const ALLOWED_IPS = process.env.ALLOWED_IPS
     ? process.env.ALLOWED_IPS.split(",").map((s) => s.trim())
     : null; // null = allow all
+const API_TOKEN = process.env.API_TOKEN || null;
 
 // ── Ensure inbox exists ──────────────────────────────────────────────────────
 if (!fs.existsSync(IMOS_INBOX)) {
@@ -85,6 +86,21 @@ if (ALLOWED_IPS) {
         }
         console.log(`[IMOS Receiver] BLOCKED request from ${clean}`);
         return res.status(403).json({ error: "Forbidden", ip: clean });
+    });
+}
+
+// ── API Token middleware ─────────────────────────────────────────────────────
+if (API_TOKEN) {
+    app.use((req, res, next) => {
+        // Exclude health check from token requirement if desired, or require it
+        if (req.path === '/health' || req.path === '/') return next();
+
+        const clientToken = req.headers["x-api-token"];
+        if (!clientToken || clientToken !== API_TOKEN) {
+            console.log(`[IMOS Receiver] BLOCKED unauthorized request (invalid or missing token) from ${req.ip}`);
+            return res.status(401).json({ error: "Unauthorized" });
+        }
+        return next();
     });
 }
 

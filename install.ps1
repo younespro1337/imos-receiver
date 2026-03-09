@@ -16,12 +16,36 @@
 # ============================================================================
 
 param(
-    [int]$Port = 3500,
-    [string]$InboxPath = "D:\ProgramData\imos AG\Factory\SIM\INBOX",
-    [string]$InstallDir = "C:\imos-receiver"
+    [int]$Port = 0,
+    [string]$InboxPath = "",
+    [string]$InstallDir = "",
+    [string]$Token = "",
+    [string]$AllowedIps = ""
 )
 
 $ErrorActionPreference = "Stop"
+
+# ── Load .env defaults (values in .env are used only when param was not passed) ──
+$envFile = Join-Path (Split-Path -Parent $MyInvocation.MyCommand.Path) ".env"
+$envDefaults = @{
+    PORT        = "3500"
+    IMOS_INBOX  = "C:\imos_inbox"
+    INSTALL_DIR = "C:\imos-receiver"
+    API_TOKEN   = ""
+    ALLOWED_IPS = ""
+}
+if (Test-Path $envFile) {
+    Get-Content $envFile | ForEach-Object {
+        if ($_ -match '^\s*([^#][^=]+)=(.*)$') {
+            $envDefaults[$Matches[1].Trim()] = $Matches[2].Trim()
+        }
+    }
+}
+if ($Port -eq 0)        { $Port      = [int]($envDefaults["PORT"]) }
+if ($InboxPath -eq "")  { $InboxPath = $envDefaults["IMOS_INBOX"] }
+if ($InstallDir -eq "") { $InstallDir = $envDefaults["INSTALL_DIR"] }
+if ($Token -eq "")      { $Token     = $envDefaults["API_TOKEN"] }
+if ($AllowedIps -eq "") { $AllowedIps = $envDefaults["ALLOWED_IPS"] }
 
 function Write-Step($msg) {
     Write-Host ""
@@ -58,6 +82,8 @@ Write-Host "============================================================" -Foreg
 Write-Host "  Port       : $Port" -ForegroundColor White
 Write-Host "  Inbox      : $InboxPath" -ForegroundColor White
 Write-Host "  Install Dir: $InstallDir" -ForegroundColor White
+Write-Host "  Token      : $(if ($Token) { '*** (set)' } else { 'NOT SET (open)' })" -ForegroundColor White
+Write-Host "  Allowed IPs: $(if ($AllowedIps) { $AllowedIps } else { 'ALL (no restriction)' })" -ForegroundColor White
 Write-Host "============================================================" -ForegroundColor Magenta
 
 # ============================================================================
@@ -145,32 +171,43 @@ if (-not (Test-Path $InstallDir)) {
     New-Item -ItemType Directory -Path $InstallDir -Force | Out-Null
 }
 
-# Copy server.js and package.json from this directory
+# Copy server.js and package.json from this directory (skip if source == destination)
 $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
-Copy-Item (Join-Path $scriptDir "server.js") (Join-Path $InstallDir "server.js") -Force
-Copy-Item (Join-Path $scriptDir "package.json") (Join-Path $InstallDir "package.json") -Force
-Write-Ok "Server files copied to $InstallDir"
+$filesToCopy = @("server.js", "package.json")
+foreach ($file in $filesToCopy) {
+    $src = Join-Path $scriptDir $file
+    $dst = Join-Path $InstallDir $file
+    if ((Resolve-Path $src).Path -eq (Resolve-Path $dst -ErrorAction SilentlyContinue).Path) {
+        Write-Ok "Already in place (skipped copy): $file"
+    } else {
+        Copy-Item $src $dst -Force
+        Write-Ok "Copied: $file"
+    }
+}
 
 # ============================================================================
 # STEP 4: Install npm dependencies
 # ============================================================================
 Write-Step "Step 4: Installing dependencies"
 
-Push-Location $InstallDir
-try {
-    # Running via cmd.exe helps prevent PowerShell from hanging on npm.cmd
-    Write-Host "  Running npm install... (this may take a minute)" -ForegroundColor Yellow
-    cmd.exe /c "npm install --omit=dev"
-
-    if ($LASTEXITCODE -ne 0) {
-        throw "npm install exited with code $LASTEXITCODE"
+$nodeModulesPath = Join-Path $InstallDir "node_modules"
+if (Test-Path $nodeModulesPath) {
+    Write-Ok "node_modules already exists, skipping npm install"
+} else {
+    Push-Location $InstallDir
+    try {
+        Write-Host "  Running npm install... (this may take a minute)" -ForegroundColor Yellow
+        cmd.exe /c "npm install --omit=dev"
+        if ($LASTEXITCODE -ne 0) {
+            throw "npm install exited with code $LASTEXITCODE"
+        }
+        Write-Ok "npm dependencies installed"
+    } catch {
+        Write-Fail "npm install failed: $_"
+        exit 1
+    } finally {
+        Pop-Location
     }
-    Write-Ok "npm dependencies installed"
-} catch {
-    Write-Fail "npm install failed: $_"
-    exit 1
-} finally {
-    Pop-Location
 }
 
 # ============================================================================
@@ -202,49 +239,68 @@ Write-Step "Step 6: Creating auto-start task"
 $taskName = "IMOS-Receiver-Server"
 $existingTask = Get-ScheduledTask -TaskName $taskName -ErrorAction SilentlyContinue
 
+$recreateTask = $true
 if ($existingTask) {
-    Unregister-ScheduledTask -TaskName $taskName -Confirm:$false
-    Write-Warn "Removed old scheduled task: $taskName"
+    # Check if the existing batch file already matches current config
+    $batchFile = Join-Path $InstallDir "start.bat"
+    if (Test-Path $batchFile) {
+        $batchContent = Get-Content $batchFile -Raw
+        if ($batchContent -match "set PORT=$Port" -and
+            $batchContent -match [regex]::Escape("set IMOS_INBOX=$InboxPath") -and
+            $batchContent -match [regex]::Escape("set API_TOKEN=$Token") -and
+            $batchContent -match [regex]::Escape("set ALLOWED_IPS=$AllowedIps")) {
+            Write-Ok "Scheduled task already up to date, skipping recreation"
+            $recreateTask = $false
+        }
+    }
+    if ($recreateTask) {
+        Unregister-ScheduledTask -TaskName $taskName -Confirm:$false
+        Write-Warn "Removed old scheduled task (config changed): $taskName"
+    }
 }
 
-# Write a batch launcher with env vars and logging baked in
-$logFile = Join-Path $InstallDir "server.log"
-$nodePath = (Get-Command node).Source
-$batchLines = @(
-    "@echo off",
-    "echo [%date% %time%] Starting IMOS Receiver... >> `"$logFile`"",
-    "set PORT=$Port",
-    "set IMOS_INBOX=$InboxPath",
-    "cd /d `"$InstallDir`"",
-    "`"$nodePath`" server.js >> `"$logFile`" 2>&1"
-)
-$batchFile = Join-Path $InstallDir "start.bat"
-$batchLines | Out-File -FilePath $batchFile -Encoding ASCII
-Write-Ok "Launcher batch created: $batchFile"
-Write-Ok "Server logs will be written to: $logFile"
+if ($recreateTask) {
+    # Write a batch launcher with env vars and logging baked in
+    $logFile = Join-Path $InstallDir "server.log"
+    $nodePath = (Get-Command node).Source
+    $batchLines = @(
+        "@echo off",
+        "echo [%date% %time%] Starting IMOS Receiver... >> `"$logFile`"",
+        "set PORT=$Port",
+        "set IMOS_INBOX=$InboxPath",
+        "set API_TOKEN=$Token",
+        "set ALLOWED_IPS=$AllowedIps",
+        "cd /d `"$InstallDir`"",
+        "`"$nodePath`" server.js >> `"$logFile`" 2>&1"
+    )
+    $batchFile = Join-Path $InstallDir "start.bat"
+    $batchLines | Out-File -FilePath $batchFile -Encoding ASCII
+    Write-Ok "Launcher batch created: $batchFile"
+    Write-Ok "Server logs will be written to: $logFile"
 
-$action = New-ScheduledTaskAction -Execute $batchFile -WorkingDirectory $InstallDir
+    $action = New-ScheduledTaskAction -Execute $batchFile -WorkingDirectory $InstallDir
+    $trigger = New-ScheduledTaskTrigger -AtStartup
+    $settings = New-ScheduledTaskSettingsSet `
+        -AllowStartIfOnBatteries `
+        -DontStopIfGoingOnBatteries `
+        -StartWhenAvailable `
+        -RestartCount 999 `
+        -RestartInterval (New-TimeSpan -Minutes 1)
+    $principal = New-ScheduledTaskPrincipal -UserId "SYSTEM" -LogonType ServiceAccount -RunLevel Highest
 
-$trigger = New-ScheduledTaskTrigger -AtStartup
+    Register-ScheduledTask `
+        -TaskName $taskName `
+        -Action $action `
+        -Trigger $trigger `
+        -Settings $settings `
+        -Principal $principal `
+        -Description "IMOS XML Receiver Server - auto-starts on boot, listens on port $Port" | Out-Null
 
-$settings = New-ScheduledTaskSettingsSet `
-    -AllowStartIfOnBatteries `
-    -DontStopIfGoingOnBatteries `
-    -StartWhenAvailable `
-    -RestartCount 999 `
-    -RestartInterval (New-TimeSpan -Minutes 1)
-
-$principal = New-ScheduledTaskPrincipal -UserId "SYSTEM" -LogonType ServiceAccount -RunLevel Highest
-
-Register-ScheduledTask `
-    -TaskName $taskName `
-    -Action $action `
-    -Trigger $trigger `
-    -Settings $settings `
-    -Principal $principal `
-    -Description "IMOS XML Receiver Server - auto-starts on boot, listens on port $Port" | Out-Null
-
-Write-Ok "Scheduled task created: $taskName (runs at system startup)"
+    Write-Ok "Scheduled task created: $taskName (runs at system startup)"
+} else {
+    $batchFile = Join-Path $InstallDir "start.bat"
+    $logFile = Join-Path $InstallDir "server.log"
+}
 
 # ============================================================================
 # STEP 7: Start the server NOW
@@ -255,10 +311,10 @@ Write-Step "Step 7: Starting IMOS Receiver Server"
 $existingProcess = Get-NetTCPConnection -LocalPort $Port -ErrorAction SilentlyContinue |
     Select-Object -ExpandProperty OwningProcess -Unique
 if ($existingProcess) {
-    foreach ($pid in $existingProcess) {
-        if ($pid -gt 0) {
-            Stop-Process -Id $pid -Force -ErrorAction SilentlyContinue
-            Write-Warn "Killed existing process on port $Port - PID $pid"
+    foreach ($procId in $existingProcess) {
+        if ($procId -gt 0) {
+            Stop-Process -Id $procId -Force -ErrorAction SilentlyContinue
+            Write-Warn "Killed existing process on port $Port - PID $procId"
         }
     }
     Start-Sleep -Seconds 1
@@ -302,6 +358,11 @@ foreach ($ip in $ips) {
 Write-Host "  Inbox     : $InboxPath" -ForegroundColor White
 Write-Host "  Install   : $InstallDir" -ForegroundColor White
 Write-Host "  Auto-start: Yes (Windows Scheduled Task)" -ForegroundColor White
+if ($Token) {
+    Write-Host "  API Token : REQUIRED (Set successfully)" -ForegroundColor Yellow
+} else {
+    Write-Host "  API Token : NOT SET (Open endpoint)" -ForegroundColor Yellow
+}
 Write-Host ""
 Write-Host "  Endpoints:" -ForegroundColor Green
 Write-Host "    GET  /              - status + stats" -ForegroundColor White
@@ -312,5 +373,8 @@ Write-Host ""
 Write-Host "  Send from createSubSo:" -ForegroundColor Green
 Write-Host "    POST http://192.168.30.41:$Port/imos/receive" -ForegroundColor Yellow
 Write-Host "    Content-Type: application/xml" -ForegroundColor Yellow
+if ($Token) {
+    Write-Host "    x-api-token: $Token" -ForegroundColor Yellow
+}
 Write-Host ""
 Write-Host "============================================================" -ForegroundColor Green
